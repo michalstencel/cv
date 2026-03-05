@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "cv",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["/tmp/cv_serve.sh"],
+      "port": 3456
+    }
+  ]
+}

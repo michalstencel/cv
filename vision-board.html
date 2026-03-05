@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manifest — Vision Board Creator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #f7f3ee;
+  --warm: #ede8e0;
+  --ink: #1a1714;
+  --ink2: #4a4540;
+  --ink3: #9a9088;
+  --gold: #c4943a;
+  --gold2: #e8b86d;
+  --blush: #e8d5c4;
+  --sage: #8a9e8c;
+  --terracotta: #c4714a;
+  --line: rgba(26,23,20,0.1);
+}
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Noise overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ══════════════════════════════════════
+   SCREEN 1 — LANDING
+══════════════════════════════════════ */
+#screen-landing {
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.landing-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 80% 20%, rgba(196,148,58,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(196,113,74,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 60% 90%, rgba(138,158,140,0.1) 0%, transparent 60%);
+}
+
+/* Floating decorative shapes */
+.landing-deco {
+  position: absolute;
+  border-radius: 2px;
+  opacity: 0.15;
+  animation: float 6s ease-in-out infinite;
+}
+
+.landing-deco:nth-child(1) { width: 120px; height: 160px; top: 8%; left: 5%; background: var(--gold); transform: rotate(-8deg); animation-delay: 0s; }
+.landing-deco:nth-child(2) { width: 80px; height: 100px; top: 15%; right: 8%; background: var(--terracotta); transform: rotate(5deg); animation-delay: 1s; }
+.landing-deco:nth-child(3) { width: 60px; height: 80px; bottom: 20%; left: 12%; background: var(--sage); transform: rotate(-3deg); animation-delay: 2s; }
+.landing-deco:nth-child(4) { width: 100px; height: 70px; bottom: 15%; right: 6%; background: var(--blush); transform: rotate(7deg); animation-delay: 0.5s; border-radius: 50%; }
+.landing-deco:nth-child(5) { width: 50px; height: 50px; top: 45%; left: 3%; background: var(--gold2); transform: rotate(12deg); animation-delay: 1.5s; border-radius: 50%; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(var(--r, -8deg)); }
+  50% { transform: translateY(-12px) rotate(var(--r, -8deg)); }
+}
+
+.landing-center {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  max-width: 620px;
+  padding: 2rem;
+}
+
+.landing-eyebrow {
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.landing-eyebrow::before,
+.landing-eyebrow::after {
+  content: '';
+  display: block;
+  width: 30px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.landing-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  font-weight: 400;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  color: var(--ink);
+}
+
+.landing-title em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.landing-sub {
+  font-size: 1rem;
+  color: var(--ink2);
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 1rem 2.2rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gold);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.btn-primary:hover::before { transform: translateX(0); }
+.btn-primary span, .btn-primary svg { position: relative; z-index: 1; }
+
+.landing-proof {
+  margin-top: 2rem;
+  font-size: 0.7rem;
+  color: var(--ink3);
+  letter-spacing: 0.05em;
+}
+
+.landing-proof strong { color: var(--ink2); }
+
+/* ══════════════════════════════════════
+   SCREEN 2 — QUIZ
+══════════════════════════════════════ */
+#screen-quiz {
+  background: var(--cream);
+}
+
+.quiz-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.quiz-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--gold);
+}
+
+.progress-track {
+  flex: 1;
+  max-width: 300px;
+  height: 2px;
+  background: var(--line);
+  margin: 0 2rem;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill-bar {
+  height: 100%;
+  background: linear-gradient(to right, var(--gold), var(--gold2));
+  border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+}
+
+.progress-label {
+  font-size: 0.7rem;
+  color: var(--ink3);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.quiz-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+}
+
+.question-wrap {
+  max-width: 640px;
+  width: 100%;
+  animation: fadeSlideIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.question-category {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.8rem;
+}
+
+.question-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--ink);
+  margin-bottom: 0.8rem;
+}
+
+.question-hint {
+  font-size: 0.82rem;
+  color: var(--ink3);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+}
+
+/* Choice grid */
+.choices-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.choices-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.choices-grid.cols-1 { grid-template-columns: 1fr; }
+
+.choice-btn {
+  background: white;
+  border: 1.5px solid var(--line);
+  padding: 1rem 1.3rem;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  color: var(--ink2);
+}
+
+.choice-btn:hover {
+  border-color: var(--gold2);
+  background: #fffdf9;
+  color: var(--ink);
+}
+
+.choice-btn.selected {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, #fffdf9, #fdf6e9);
+  color: var(--ink);
+}
+
+.choice-emoji { font-size: 1.3rem; flex-shrink: 0; }
+
+.choice-text-wrap { flex: 1; }
+.choice-title { font-weight: 500; font-size: 0.9rem; }
+.choice-desc { font-size: 0.75rem; color: var(--ink3); margin-top: 0.15rem; }
+
+.choice-check {
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--line);
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.choice-btn.selected .choice-check {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: white;
+  font-size: 0.6rem;
+}
+
+/* Text input question */
+.intention-input {
+  width: 100%;
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  padding: 1rem 1.2rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-style: italic;
+  color: var(--ink);
+  outline: none;
+  resize: none;
+  transition: border-color 0.2s;
+  line-height: 1.6;
+}
+
+.intention-input:focus { border-color: var(--gold); }
+.intention-input::placeholder { color: var(--ink3); }
+
+.quiz-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  max-width: 640px;
+  width: 100%;
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  color: var(--ink3);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: color 0.2s;
+}
+
+.btn-back:hover { color: var(--ink); }
+
+.btn-next {
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  padding: 0.85rem 2rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-next:hover { background: var(--gold); }
+.btn-next:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-next:disabled:hover { background: var(--ink); }
+
+/* ══════════════════════════════════════
+   SCREEN 3 — IMAGE PICKER
+══════════════════════════════════════ */
+#screen-images {
+  background: var(--warm);
+}
+
+.images-header {
+  padding: 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--cream);
+}
+
+.images-title-block {}
+
+.images-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.images-subtitle {
+  font-size: 0.75rem;
+  color: var(--ink3);
+  margin-top: 0.2rem;
+}
+
+.images-selected-count {
+  font-size: 0.75rem;
+  color: var(--ink3);
+  letter-spacing: 0.05em;
+}
+
+.images-selected-count strong { color: var(--gold); }
+
+/* Category tabs */
+.category-tabs {
+  display: flex;
+  gap: 0;
+  padding: 1rem 2.5rem 0;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+
+.cat-tab {
+  background: none;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--ink3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+}
+
+.cat-tab:hover { color: var(--ink); }
+.cat-tab.active { color: var(--ink); border-bottom-color: var(--gold); font-weight: 500; }
+
+/* Image grid */
+.images-body {
+  flex: 1;
+  padding: 1.5rem 2.5rem;
+  overflow-y: auto;
+}
+
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 0.8rem;
+}
+
+.img-card {
+  position: relative;
+  aspect-ratio: 3/4;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--blush);
+  transition: transform 0.2s;
+}
+
+.img-card:hover { transform: scale(1.02); }
+
+.img-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+
+.img-card:hover img { transform: scale(1.05); }
+
+.img-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(26,23,20,0.0);
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.img-card:hover .img-card-overlay { background: rgba(26,23,20,0.1); }
+
+.img-check {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.85rem;
+}
+
+.img-card:hover .img-check { opacity: 0.7; }
+.img-card.selected .img-check { opacity: 1; background: var(--gold); border-color: var(--gold); color: white; }
+.img-card.selected .img-card-overlay { background: rgba(196,148,58,0.15); }
+.img-card.selected { outline: 2.5px solid var(--gold); outline-offset: 2px; }
+
+/* Upload card */
+.img-card-upload {
+  aspect-ratio: 3/4;
+  border-radius: 4px;
+  border: 2px dashed var(--blush);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(255,255,255,0.5);
+}
+
+.img-card-upload:hover { border-color: var(--gold); background: rgba(255,255,255,0.8); }
+
+.upload-icon { font-size: 1.5rem; opacity: 0.5; }
+.upload-text { font-size: 0.7rem; color: var(--ink3); text-align: center; letter-spacing: 0.05em; }
+
+.images-footer {
+  padding: 1rem 2.5rem;
+  background: var(--cream);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ══════════════════════════════════════
+   SCREEN 4 — BOARD EDITOR
+══════════════════════════════════════ */
+#screen-board {
+  background: #2a2520;
+  flex-direction: row;
+}
+
+.board-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: #1e1a17;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-header {
+  padding: 1.2rem 1.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-logo {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--gold2);
+}
+
+.sidebar-section {
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 0.8rem;
+}
+
+/* Thumbnail strip */
+.thumb-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.3rem;
+}
+
+.thumb-item {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  background: #333;
+}
+
+.thumb-item:hover { opacity: 1; }
+.thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Affirmations */
+.affirmation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.affirmation-chip {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 0.35rem 0.8rem;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.affirmation-chip:hover {
+  background: rgba(196,148,58,0.15);
+  border-color: var(--gold);
+  color: var(--gold2);
+}
+
+/* Board bg selector */
+.bg-swatches {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.bg-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.bg-swatch.active { border-color: var(--gold2); }
+.bg-swatch:hover { border-color: rgba(255,255,255,0.3); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.btn-print {
+  width: 100%;
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  padding: 0.9rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.btn-print:hover { background: var(--gold2); }
+
+.btn-save {
+  width: 100%;
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 0.7rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s;
+}
+
+.btn-save:hover { background: rgba(255,255,255,0.12); color: white; }
+
+/* Board canvas area */
+.board-canvas-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.board-canvas {
+  position: relative;
+  aspect-ratio: 3/2;
+  max-height: calc(100vh - 4rem);
+  max-width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+}
+
+/* Board items */
+.board-item {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.2s;
+}
+
+.board-item:active { cursor: grabbing; }
+
+.board-item.dragging {
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  z-index: 100;
+}
+
+.board-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+.board-item-controls {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: none;
+  gap: 3px;
+}
+
+.board-item:hover .board-item-controls { display: flex; }
+
+.item-ctrl-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-delete-item { background: #e63222; color: white; }
+.btn-rotate-item { background: white; color: var(--ink); }
+
+/* Text item on board */
+.board-text-item {
+  position: absolute;
+  cursor: grab;
+  user-select: none;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  text-align: center;
+  min-width: 120px;
+  padding: 0.4rem 0.6rem;
+}
+
+.board-text-item:active { cursor: grabbing; }
+
+/* Resize handle */
+.resize-handle {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  cursor: se-resize;
+  display: none;
+  border: 1.5px solid var(--gold);
+}
+
+.board-item:hover .resize-handle { display: block; }
+
+/* ══════════════════════════════════════
+   SCREEN 5 — CHECKOUT
+══════════════════════════════════════ */
+#screen-checkout {
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+}
+
+.checkout-wrap {
+  max-width: 700px;
+  width: 100%;
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.checkout-preview {
+  aspect-ratio: 3/2;
+  background: #f0e8df;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkout-preview-label {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--ink3);
+}
+
+.checkout-form {}
+
+.checkout-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.checkout-sub {
+  font-size: 0.8rem;
+  color: var(--ink3);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.plan-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+}
+
+.plan-card {
+  border: 1.5px solid var(--line);
+  border-radius: 4px;
+  padding: 0.9rem 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s;
+  background: white;
+}
+
+.plan-card:hover { border-color: var(--gold2); }
+.plan-card.selected { border-color: var(--gold); background: #fffdf7; }
+
+.plan-info {}
+.plan-name { font-weight: 500; font-size: 0.88rem; }
+.plan-desc { font-size: 0.72rem; color: var(--ink3); margin-top: 0.15rem; }
+
+.plan-price {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.plan-price span { font-size: 0.75rem; font-weight: 400; color: var(--ink3); }
+
+.plan-badge {
+  background: var(--gold);
+  color: var(--ink);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+  margin-left: 0.5rem;
+}
+
+/* ── Animations ── */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.scale-in { animation: scaleIn 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+
+/* Tooltip */
+.tooltip {
+  position: fixed;
+  background: var(--ink);
+  color: var(--cream);
+  padding: 0.4rem 0.8rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.2s;
+  letter-spacing: 0.05em;
+}
+
+.tooltip.visible { opacity: 1; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--blush); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ══ SCREEN 1: LANDING ══ -->
+<div class="screen active" id="screen-landing">
+  <div class="landing-bg"></div>
+  <div class="landing-deco"></div>
+  <div class="landing-deco"></div>
+  <div class="landing-deco"></div>
+  <div class="landing-deco"></div>
+  <div class="landing-deco"></div>
+
+  <div class="landing-center">
+    <div class="landing-eyebrow">Vision Board Creator</div>
+    <h1 class="landing-title">Your future<br><em>visualised</em></h1>
+    <p class="landing-sub">Answer a few questions about what you truly want. We'll help you build a beautiful vision board — and print it for your wall.</p>
+    <button class="btn-primary" onclick="startQuiz()">
+      <span>Begin your journey</span>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="landing-proof">Trusted by <strong>12,400+</strong> people who manifested their vision</div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: QUIZ ══ -->
+<div class="screen" id="screen-quiz">
+  <div class="quiz-header">
+    <div class="quiz-logo">manifest.</div>
+    <div class="progress-track">
+      <div class="progress-fill-bar" id="quizProgress" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="quizStep">Step 1 of 5</div>
+  </div>
+
+  <div class="quiz-body">
+    <div class="question-wrap" id="questionWrap">
+      <!-- filled by JS -->
+    </div>
+    <div class="quiz-nav" id="quizNav">
+      <button class="btn-back" id="btnBack" onclick="prevQuestion()">
+        ← Back
+      </button>
+      <button class="btn-next" id="btnNext" onclick="nextQuestion()">
+        Continue →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: IMAGES ══ -->
+<div class="screen" id="screen-images">
+  <div class="images-header">
+    <div class="images-title-block">
+      <div class="images-title">Choose your images</div>
+      <div class="images-subtitle">Select photos that resonate with your vision. You can add your own too.</div>
+    </div>
+    <div class="images-selected-count"><strong id="selectedCount">0</strong> selected</div>
+  </div>
+
+  <div class="category-tabs" id="categoryTabs"></div>
+
+  <div class="images-body">
+    <div class="images-grid" id="imagesGrid"></div>
+  </div>
+
+  <div class="images-footer">
+    <button class="btn-back" onclick="showScreen('screen-quiz'); currentQuestion = questions.length - 1; renderQuestion();">
+      ← Back to questions
+    </button>
+    <button class="btn-next" onclick="showScreen('screen-board'); buildBoard();">
+      Build my board →
+    </button>
+  </div>
+</div>
+
+<!-- ══ SCREEN 4: BOARD EDITOR ══ -->
+<div class="screen" id="screen-board">
+  <div class="board-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">manifest.</div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Your images</div>
+      <div class="thumb-grid" id="sidebarThumbs"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Add affirmation</div>
+      <div class="affirmation-list" id="affirmationList"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Board background</div>
+      <div class="bg-swatches" id="bgSwatches"></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="btn-print" onclick="showScreen('screen-checkout')">
+        🖨 Order print — from €19
+      </button>
+      <button class="btn-save">↓ Save as image</button>
+    </div>
+  </div>
+
+  <div class="board-canvas-wrap">
+    <div class="board-canvas" id="boardCanvas">
+      <!-- items added by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 5: CHECKOUT ══ -->
+<div class="screen" id="screen-checkout">
+  <div class="checkout-wrap scale-in">
+    <div class="checkout-preview">
+      <span class="checkout-preview-label">Your board preview</span>
+    </div>
+    <div class="checkout-form">
+      <h2 class="checkout-title">Bring it to life.</h2>
+      <p class="checkout-sub">Your vision board, printed on premium paper and delivered to your door. Hang it where you'll see it every day.</p>
+
+      <div class="plan-cards">
+        <div class="plan-card" onclick="selectPlan(this)">
+          <div class="plan-info">
+            <div class="plan-name">Digital only</div>
+            <div class="plan-desc">HD download, no watermark</div>
+          </div>
+          <div class="plan-price">€4.99</div>
+        </div>
+        <div class="plan-card selected" onclick="selectPlan(this)">
+          <div class="plan-info">
+            <div class="plan-name">A2 Poster print <span class="plan-badge">POPULAR</span></div>
+            <div class="plan-desc">420×594mm · matte art paper · free shipping</div>
+          </div>
+          <div class="plan-price">€22<span>/once</span></div>
+        </div>
+        <div class="plan-card" onclick="selectPlan(this)">
+          <div class="plan-info">
+            <div class="plan-name">Quarterly ritual</div>
+            <div class="plan-desc">New board + print every 3 months</div>
+          </div>
+          <div class="plan-price">€9<span>/mo</span></div>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="width:100%; justify-content:center;">
+        <span>Order now</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <p style="font-size:0.68rem; color:var(--ink3); text-align:center; margin-top:0.8rem;">
+        Secure payment · Printed in EU · Delivered in 3–5 days
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// DATA
+// ══════════════════════════════════════
+
+const questions = [
+  {
+    id: 'feel',
+    category: 'Foundation',
+    text: 'How do you want to feel in one year from now?',
+    hint: 'Choose up to 2 that resonate most deeply.',
+    type: 'multi',
+    max: 2,
+    choices: [
+      { emoji: '✨', title: 'Free', desc: 'Liberated, unbound, living on my own terms' },
+      { emoji: '🔥', title: 'Alive', desc: 'Energised, passionate, on fire' },
+      { emoji: '🌿', title: 'Peaceful', desc: 'Calm, grounded, in harmony' },
+      { emoji: '💎', title: 'Abundant', desc: 'Prosperous, secure, overflowing' },
+      { emoji: '❤️', title: 'Loved', desc: 'Connected, belonging, cherished' },
+      { emoji: '🚀', title: 'Powerful', desc: 'Confident, impactful, unstoppable' },
+    ],
+    cols: 2
+  },
+  {
+    id: 'life',
+    category: 'Life areas',
+    text: 'Which areas of life do you most want to transform?',
+    hint: 'Select everything that calls to you right now.',
+    type: 'multi',
+    max: 4,
+    choices: [
+      { emoji: '💰', title: 'Money & Career', desc: 'Income, work, financial freedom' },
+      { emoji: '💞', title: 'Love & Relationships', desc: 'Partnership, family, friendships' },
+      { emoji: '🏃', title: 'Health & Body', desc: 'Fitness, energy, wellbeing' },
+      { emoji: '🌍', title: 'Travel & Adventure', desc: 'Exploring the world' },
+      { emoji: '🏡', title: 'Home & Lifestyle', desc: 'Where and how I live' },
+      { emoji: '🎨', title: 'Creativity & Purpose', desc: 'Expression, calling, meaning' },
+      { emoji: '🧠', title: 'Growth & Learning', desc: 'Knowledge, skills, wisdom' },
+      { emoji: '🌟', title: 'Spirituality', desc: 'Connection, mindfulness, faith' },
+    ],
+    cols: 2
+  },
+  {
+    id: 'intention',
+    category: 'Your intention',
+    text: 'In one sentence — what is your biggest dream right now?',
+    hint: 'Write it as if it has already happened. Be bold.',
+    type: 'text',
+    placeholder: 'I am living in my dream home by the sea, doing work I love…',
+    cols: 1
+  },
+  {
+    id: 'vibe',
+    category: 'Aesthetic',
+    text: 'What visual world speaks to your soul?',
+    hint: 'This shapes the mood of your board.',
+    type: 'single',
+    choices: [
+      { emoji: '🌸', title: 'Soft & Romantic', desc: 'Pastels, florals, gentle light' },
+      { emoji: '🖤', title: 'Dark & Luxurious', desc: 'Deep tones, rich textures, dramatic' },
+      { emoji: '🌿', title: 'Natural & Earthy', desc: 'Greens, wood, organic forms' },
+      { emoji: '⚡', title: 'Bold & Modern', desc: 'Graphic, architectural, minimal' },
+    ],
+    cols: 2
+  },
+  {
+    id: 'word',
+    category: 'Your word',
+    text: 'Choose one word that will anchor your board.',
+    hint: 'This becomes your personal mantra for the year.',
+    type: 'single',
+    choices: [
+      { emoji: '', title: 'FLOURISH', desc: '' },
+      { emoji: '', title: 'EXPAND', desc: '' },
+      { emoji: '', title: 'RECEIVE', desc: '' },
+      { emoji: '', title: 'BECOME', desc: '' },
+      { emoji: '', title: 'RADIATE', desc: '' },
+      { emoji: '', title: 'CREATE', desc: '' },
+      { emoji: '', title: 'TRUST', desc: '' },
+      { emoji: '', title: 'RISE', desc: '' },
+    ],
+    cols: 2
+  }
+];
+
+// Image bank — using Unsplash source URLs
+const imageBank = {
+  'All': [],
+  'Freedom': [
+    { url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80', label: 'Mountains' },
+    { url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&q=80', label: 'Open road' },
+    { url: 'https://images.unsplash.com/photo-1465101162946-4377e57745c3?w=400&q=80', label: 'Starry sky' },
+    { url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80', label: 'Ocean' },
+    { url: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&q=80', label: 'Night sky' },
+    { url: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80', label: 'Forest' },
+  ],
+  'Abundance': [
+    { url: 'https://images.unsplash.com/photo-1515541324332-7dd0c37426e0?w=400&q=80', label: 'Luxury living' },
+    { url: 'https://images.unsplash.com/photo-1524813686514-a57563d77965?w=400&q=80', label: 'Success' },
+    { url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&q=80', label: 'Flowers market' },
+    { url: 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&q=80', label: 'Fashion' },
+    { url: 'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?w=400&q=80', label: 'Architecture' },
+    { url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&q=80', label: 'Dream home' },
+  ],
+  'Love': [
+    { url: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=400&q=80', label: 'Connection' },
+    { url: 'https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=400&q=80', label: 'Together' },
+    { url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&q=80', label: 'Friends' },
+    { url: 'https://images.unsplash.com/photo-1474552226712-ac0f0961a954?w=400&q=80', label: 'Family' },
+    { url: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=400&q=80', label: 'Joy' },
+    { url: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&q=80', label: 'Celebration' },
+  ],
+  'Health': [
+    { url: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&q=80', label: 'Yoga' },
+    { url: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&q=80', label: 'Running' },
+    { url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80', label: 'Healthy food' },
+    { url: 'https://images.unsplash.com/photo-1524862560069-5b26fde53bdc?w=400&q=80', label: 'Meditation' },
+    { url: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80', label: 'Wellness' },
+    { url: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&q=80', label: 'Strength' },
+  ],
+  'Travel': [
+    { url: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&q=80', label: 'Paris' },
+    { url: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&q=80', label: 'Bali' },
+    { url: 'https://images.unsplash.com/photo-1555993539-1732b0258235?w=400&q=80', label: 'Tokyo' },
+    { url: 'https://images.unsplash.com/photo-1528702748617-c64d49f918af?w=400&q=80', label: 'Santorini' },
+    { url: 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=400&q=80', label: 'Maldives' },
+    { url: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80', label: 'City life' },
+  ],
+};
+
+// Build 'All' from all categories
+Object.keys(imageBank).forEach(k => {
+  if (k !== 'All') imageBank['All'].push(...imageBank[k]);
+});
+
+const boardBgs = [
+  { color: '#f5ede0', label: 'Warm cream' },
+  { color: '#e8e0d5', label: 'Linen' },
+  { color: '#1a1714', label: 'Dark' },
+  { color: '#2d3a2e', label: 'Forest' },
+  { color: '#2a2035', label: 'Night' },
+  { color: '#3a2a20', label: 'Espresso' },
+  { color: 'linear-gradient(135deg,#fdf0e0,#e8d5c4)', label: 'Sunset' },
+  { color: 'linear-gradient(135deg,#e0e8f0,#d5cae8)', label: 'Dusk' },
+];
+
+const affirmations = [
+  'I am magnetic.', 'I attract abundance.', 'I deserve this.',
+  'My dream life is real.', 'I am becoming.', 'Everything is possible.',
+];
+
+// ══════════════════════════════════════
+// STATE
+// ══════════════════════════════════════
+let currentQuestion = 0;
+let answers = {};
+let selectedImages = [];
+let boardItems = [];
+let selectedBg = 0;
+let currentCategory = 'All';
+
+// ══════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  showScreen('screen-quiz');
+  currentQuestion = 0;
+  renderQuestion();
+}
+
+// ══════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════
+function renderQuestion() {
+  const q = questions[currentQuestion];
+  const wrap = document.getElementById('questionWrap');
+
+  const pct = ((currentQuestion) / questions.length) * 100;
+  document.getElementById('quizProgress').style.width = pct + '%';
+  document.getElementById('quizStep').textContent = `Step ${currentQuestion + 1} of ${questions.length}`;
+
+  let choicesHTML = '';
+
+  if (q.type === 'text') {
+    const val = answers[q.id] || '';
+    choicesHTML = `<textarea class="intention-input" id="textAnswer" rows="3" placeholder="${q.placeholder}">${val}</textarea>`;
+  } else {
+    choicesHTML = `<div class="choices-grid cols-${q.cols || 2}">`;
+    q.choices.forEach((c, i) => {
+      const sel = answers[q.id] && (Array.isArray(answers[q.id]) ? answers[q.id].includes(i) : answers[q.id] === i);
+      choicesHTML += `
+        <button class="choice-btn ${sel ? 'selected' : ''}" onclick="selectChoice(${i})">
+          ${c.emoji ? `<span class="choice-emoji">${c.emoji}</span>` : ''}
+          <div class="choice-text-wrap">
+            <div class="choice-title">${c.title}</div>
+            ${c.desc ? `<div class="choice-desc">${c.desc}</div>` : ''}
+          </div>
+          <div class="choice-check">${sel ? '✓' : ''}</div>
+        </button>`;
+    });
+    choicesHTML += '</div>';
+  }
+
+  wrap.innerHTML = `
+    <div class="question-category">${q.category}</div>
+    <h2 class="question-text">${q.text}</h2>
+    <p class="question-hint">${q.hint}</p>
+    ${choicesHTML}
+  `;
+
+  // Retrigger animation
+  wrap.style.animation = 'none';
+  void wrap.offsetWidth;
+  wrap.style.animation = '';
+  wrap.classList.remove('fadeSlideIn');
+  void wrap.offsetWidth;
+  wrap.style.animation = 'fadeSlideIn 0.4s cubic-bezier(0.16,1,0.3,1) both';
+
+  document.getElementById('btnBack').style.visibility = currentQuestion === 0 ? 'hidden' : 'visible';
+
+  // Next button label
+  const isLast = currentQuestion === questions.length - 1;
+  document.getElementById('btnNext').innerHTML = isLast
+    ? 'Choose images →'
+    : 'Continue →';
+}
+
+function selectChoice(idx) {
+  const q = questions[currentQuestion];
+
+  if (q.type === 'single') {
+    answers[q.id] = idx;
+  } else if (q.type === 'multi') {
+    if (!answers[q.id]) answers[q.id] = [];
+    const arr = answers[q.id];
+    const pos = arr.indexOf(idx);
+    if (pos > -1) {
+      arr.splice(pos, 1);
+    } else if (arr.length < q.max) {
+      arr.push(idx);
+    }
+  }
+  renderQuestion();
+}
+
+function nextQuestion() {
+  if (questions[currentQuestion].type === 'text') {
+    answers[questions[currentQuestion].id] = document.getElementById('textAnswer').value;
+  }
+
+  if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
+    renderQuestion();
+  } else {
+    showScreen('screen-images');
+    renderImages();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion();
+  }
+}
+
+// ══════════════════════════════════════
+// IMAGES
+// ══════════════════════════════════════
+function renderImages() {
+  // Tabs
+  const tabs = document.getElementById('categoryTabs');
+  tabs.innerHTML = '';
+  Object.keys(imageBank).forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-tab' + (cat === currentCategory ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => { currentCategory = cat; renderImages(); };
+    tabs.appendChild(btn);
+  });
+
+  // Grid
+  const grid = document.getElementById('imagesGrid');
+  grid.innerHTML = '';
+
+  // Upload card
+  const uploadCard = document.createElement('div');
+  uploadCard.className = 'img-card-upload';
+  uploadCard.innerHTML = `<div class="upload-icon">+</div><div class="upload-text">Upload your own photo</div>`;
+  uploadCard.onclick = () => {
+    const inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*';
+    inp.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      const custom = { url, label: 'My photo', custom: true };
+      imageBank['All'].unshift(custom);
+      if (currentCategory !== 'All') {
+        imageBank[currentCategory] = imageBank[currentCategory] || [];
+        imageBank[currentCategory].unshift(custom);
+      }
+      selectedImages.push(url);
+      renderImages();
+    };
+    inp.click();
+  };
+  grid.appendChild(uploadCard);
+
+  imageBank[currentCategory].forEach((img, i) => {
+    const card = document.createElement('div');
+    card.className = 'img-card' + (selectedImages.includes(img.url) ? ' selected' : '');
+    card.innerHTML = `
+      <img src="${img.url}" alt="${img.label}" loading="lazy">
+      <div class="img-card-overlay">
+        <div class="img-check">${selectedImages.includes(img.url) ? '✓' : ''}</div>
+      </div>`;
+    card.onclick = () => {
+      const idx = selectedImages.indexOf(img.url);
+      if (idx > -1) selectedImages.splice(idx, 1);
+      else selectedImages.push(img.url);
+      document.getElementById('selectedCount').textContent = selectedImages.length;
+      renderImages();
+    };
+    grid.appendChild(card);
+  });
+
+  document.getElementById('selectedCount').textContent = selectedImages.length;
+}
+
+// ══════════════════════════════════════
+// BOARD BUILDER
+// ══════════════════════════════════════
+function buildBoard() {
+  const canvas = document.getElementById('boardCanvas');
+  canvas.innerHTML = '';
+  canvas.style.background = boardBgs[selectedBg].color;
+
+  // Place images in a nice collage layout
+  const layouts = [
+    { x: 2, y: 2, w: 35, h: 55 },
+    { x: 38, y: 2, w: 30, h: 40 },
+    { x: 69, y: 2, w: 29, h: 55 },
+    { x: 2, y: 58, w: 25, h: 40 },
+    { x: 28, y: 43, w: 40, h: 30 },
+    { x: 69, y: 58, w: 29, h: 40 },
+    { x: 28, y: 74, w: 20, h: 24 },
+    { x: 49, y: 74, w: 19, h: 24 },
+  ];
+
+  const imgs = selectedImages.length > 0 ? selectedImages : imageBank['Freedom'].slice(0,5).map(i=>i.url);
+
+  imgs.slice(0, layouts.length).forEach((url, i) => {
+    const l = layouts[i];
+    const item = document.createElement('div');
+    item.className = 'board-item';
+    item.style.cssText = `left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%;`;
+    item.innerHTML = `
+      <img src="${url}" alt="">
+      <div class="board-item-controls">
+        <button class="item-ctrl-btn btn-delete-item" onclick="this.closest('.board-item').remove()">×</button>
+      </div>
+      <div class="resize-handle"></div>`;
+    makeDraggable(item, canvas);
+    canvas.appendChild(item);
+  });
+
+  // Add anchor word from quiz
+  const word = answers.word !== undefined ? questions[4].choices[answers.word].title : 'FLOURISH';
+  addTextToBoard(word, 42, 44, canvas);
+
+  // Sidebar thumbs
+  const thumbGrid = document.getElementById('sidebarThumbs');
+  thumbGrid.innerHTML = '';
+  imgs.forEach(url => {
+    const t = document.createElement('div');
+    t.className = 'thumb-item';
+    t.innerHTML = `<img src="${url}">`;
+    t.onclick = () => addImageToBoard(url, canvas);
+    thumbGrid.appendChild(t);
+  });
+
+  // Affirmations
+  const affList = document.getElementById('affirmationList');
+  affList.innerHTML = '';
+  const customAffirmation = answers.intention
+    ? [answers.intention.slice(0, 40) + (answers.intention.length > 40 ? '…' : ''), ...affirmations.slice(0,5)]
+    : affirmations;
+
+  customAffirmation.forEach(text => {
+    const chip = document.createElement('div');
+    chip.className = 'affirmation-chip';
+    chip.textContent = text;
+    chip.onclick = () => {
+      const x = 20 + Math.random() * 40;
+      const y = 20 + Math.random() * 50;
+      addTextToBoard(text, x, y, canvas);
+    };
+    affList.appendChild(chip);
+  });
+
+  // Background swatches
+  const swatchWrap = document.getElementById('bgSwatches');
+  swatchWrap.innerHTML = '';
+  boardBgs.forEach((bg, i) => {
+    const s = document.createElement('div');
+    s.className = 'bg-swatch' + (i === selectedBg ? ' active' : '');
+    s.style.background = bg.color;
+    s.title = bg.label;
+    s.onclick = () => {
+      selectedBg = i;
+      canvas.style.background = bg.color;
+      document.querySelectorAll('.bg-swatch').forEach((sw,j) => sw.classList.toggle('active', j===i));
+    };
+    swatchWrap.appendChild(s);
+  });
+}
+
+function addImageToBoard(url, canvas) {
+  const item = document.createElement('div');
+  item.className = 'board-item';
+  const x = 10 + Math.random() * 50;
+  const y = 10 + Math.random() * 50;
+  item.style.cssText = `left:${x}%;top:${y}%;width:25%;height:35%;`;
+  item.innerHTML = `
+    <img src="${url}" alt="">
+    <div class="board-item-controls">
+      <button class="item-ctrl-btn btn-delete-item" onclick="this.closest('.board-item').remove()">×</button>
+    </div>
+    <div class="resize-handle"></div>`;
+  makeDraggable(item, canvas);
+  canvas.appendChild(item);
+}
+
+function addTextToBoard(text, xPct, yPct, canvas) {
+  const item = document.createElement('div');
+  item.className = 'board-text-item';
+
+  // Color based on bg
+  const isDark = boardBgs[selectedBg].color.includes('#1') || boardBgs[selectedBg].color.includes('#2') || boardBgs[selectedBg].color.includes('#3');
+  const textColor = isDark ? 'rgba(255,255,255,0.9)' : 'rgba(26,23,20,0.9)';
+
+  item.style.cssText = `left:${xPct}%;top:${yPct}%;font-size:1.4rem;color:${textColor};text-shadow: 0 2px 10px rgba(0,0,0,0.15);`;
+  item.textContent = text;
+  item.innerHTML = `
+    ${text}
+    <div class="board-item-controls" style="display:none">
+      <button class="item-ctrl-btn btn-delete-item" onclick="this.closest('.board-text-item').remove()">×</button>
+    </div>`;
+  item.querySelector('.board-item-controls').style.display = 'none';
+  item.onmouseenter = () => item.querySelector('.board-item-controls').style.display = 'flex';
+  item.onmouseleave = () => item.querySelector('.board-item-controls').style.display = 'none';
+
+  makeDraggable(item, canvas);
+  canvas.appendChild(item);
+}
+
+// ── Drag & drop ──────────────────────────────────────────────
+function makeDraggable(el, container) {
+  let startX, startY, startLeft, startTop, isDragging = false;
+
+  el.addEventListener('mousedown', e => {
+    if (e.target.classList.contains('item-ctrl-btn')) return;
+    if (e.target.classList.contains('resize-handle')) return;
+    isDragging = true;
+    el.classList.add('dragging');
+    const rect = container.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    startX = e.clientX;
+    startY = e.clientY;
+    startLeft = (elRect.left - rect.left) / rect.width * 100;
+    startTop = (elRect.top - rect.top) / rect.height * 100;
+    el.style.zIndex = 50;
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const rect = container.getBoundingClientRect();
+    const dx = (e.clientX - startX) / rect.width * 100;
+    const dy = (e.clientY - startY) / rect.height * 100;
+    el.style.left = Math.max(0, Math.min(90, startLeft + dx)) + '%';
+    el.style.top = Math.max(0, Math.min(90, startTop + dy)) + '%';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (isDragging) {
+      isDragging = false;
+      el.classList.remove('dragging');
+      el.style.zIndex = '';
+    }
+  });
+
+  // Resize
+  const handle = el.querySelector('.resize-handle');
+  if (!handle) return;
+  let resizing = false, rStartX, rStartY, rStartW, rStartH;
+
+  handle.addEventListener('mousedown', e => {
+    resizing = true;
+    rStartX = e.clientX; rStartY = e.clientY;
+    const rect = container.getBoundingClientRect();
+    rStartW = el.offsetWidth / rect.width * 100;
+    rStartH = el.offsetHeight / rect.height * 100;
+    e.stopPropagation();
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!resizing) return;
+    const rect = container.getBoundingClientRect();
+    const dw = (e.clientX - rStartX) / rect.width * 100;
+    const dh = (e.clientY - rStartY) / rect.height * 100;
+    el.style.width = Math.max(8, rStartW + dw) + '%';
+    el.style.height = Math.max(8, rStartH + dh) + '%';
+  });
+
+  document.addEventListener('mouseup', () => { resizing = false; });
+}
+
+// ══════════════════════════════════════
+// CHECKOUT
+// ══════════════════════════════════════
+function selectPlan(card) {
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+// Init quiz render
+renderQuestion();
+</script>
+</body>
+</html>
